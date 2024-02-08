@@ -52,14 +52,16 @@ function Navigation() {
             </NavLink>
           </li>
         )}
-        <li>
-          <NavLink
-            to="/community"
-            className="font-medium text-blue-600 hover:text-blue-800"
-          >
-            Community
-          </NavLink>
-        </li>
+        {user && (
+          <li>
+            <NavLink
+              to="/community"
+              className="font-medium text-blue-600 hover:text-blue-800"
+            >
+              Community
+            </NavLink>
+          </li>
+        )}
       </ul>
     </nav>
   );

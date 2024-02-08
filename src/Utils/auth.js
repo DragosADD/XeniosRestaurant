@@ -6,6 +6,7 @@ export async function getUser() {
   if (!token.session) return null;
 
   const { data, error } = await supabase.auth.getUser();
+
   if (error) throw new Error(error.message);
 
   if (data?.user) {

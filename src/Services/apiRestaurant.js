@@ -97,7 +97,8 @@ export async function getOrder(id) {
   return order;
 }
 
-export async function addComment(reviewId, comment, name, userId) {
+export async function addComment(reviewId, comment, name, userId, role) {
+  name = role === 'role' ? 'Moderator' : name;
   const { data, error } = await supabase
     .from('Comments')
     .insert([
@@ -397,7 +398,6 @@ export async function updateRecipe(updatedData) {
   const parsedIngredients = JSON.parse(ingredients);
 
   if (parsedIngredients.length > 0) {
-    console.log(ingredients);
     const { response, errorDel } = await supabase
       .from('IngredientsUsed')
       .delete()
@@ -516,7 +516,7 @@ export async function uploadRecipe(data) {
       },
     ])
     .select();
-  console.log(final, `si `, ingredientsArray);
+
   const newIngredientUsedData = await Promise.all(
     ingredientsArray.map(async (ingredient, index) => {
       const { data: insertedIngredient, error: insertError } = await supabase

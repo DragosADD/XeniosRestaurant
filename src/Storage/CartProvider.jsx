@@ -78,9 +78,10 @@ const CartReducer = (state, action) => {
     };
   }
   if (action.type === 'GIVEPRIORITY') {
+    console.log(action.hasPriority);
     return {
       ...state,
-      hasPriority: !state.hasPriority,
+      hasPriority: action.hasPriority,
     };
   }
 
@@ -92,8 +93,8 @@ const CartReducer = (state, action) => {
         totalPrice: item.totalPrice,
       };
     });
-    console.log(orderItems);
-    const timeNow = new Date(new Date().getTime() + 60 * 60 * 4000);
+
+    const timeNow = new Date(new Date().getTime() + 60 * 60 * 3000);
     const order = {
       status: 'In process',
       priority: state.hasPriority,
@@ -136,8 +137,8 @@ export default function CartProvider(props) {
   const orderRecipesHandler = (obj) => {
     dispatchCartAction({ type: 'ORDER', obj: obj });
   };
-  const changePriorityHandler = () => {
-    dispatchCartAction({ type: 'GIVEPRIORITY' });
+  const changePriorityHandler = (hasPriority) => {
+    dispatchCartAction({ type: 'GIVEPRIORITY', hasPriority: hasPriority });
   };
 
   const cartContext = {

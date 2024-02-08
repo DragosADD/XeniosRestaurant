@@ -16,7 +16,7 @@ function Home() {
         <Carousel slideInterval={3000}>
           <img
             alt="restaurantInside"
-            src="https://secretnyc.co/wp-content/uploads/2022/09/souvlaki-gr-1024x683.jpeg"
+            src="https://offloadmedia.feverup.com/secretnyc.co/wp-content/uploads/2022/09/25090140/souvlaki-gr-1024x683.jpeg"
           />
           <img
             alt="restaurantOutside"

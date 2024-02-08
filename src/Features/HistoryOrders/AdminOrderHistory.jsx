@@ -10,9 +10,25 @@ import {
 import { getUser } from '../../Utils/auth';
 import HistoryItem from './HistoryItem';
 import { useState } from 'react';
+import { calculateTimeDifference } from '../../utils/helpers';
 
 const today = new Date();
 today.setHours(0, 0, 0, 0);
+
+function combineAndSortOrders(orders) {
+  const sortByDeliveryTime = (a, b) =>
+    new Date(a.deliveryTime) - new Date(b.deliveryTime);
+
+  const priorityOrders = orders.filter((order) => order.priority);
+
+  priorityOrders.sort(sortByDeliveryTime);
+
+  const nonPriorityOrders = orders.filter((order) => !order.priority);
+
+  nonPriorityOrders.sort(sortByDeliveryTime);
+
+  return [...nonPriorityOrders, ...priorityOrders].reverse();
+}
 
 export default function AdminOrderHistory() {
   const orders = useLoaderData();
@@ -35,7 +51,11 @@ export default function AdminOrderHistory() {
     return dateOfTheOrder >= today && el.status === 'In process';
   });
 
-  const ShowTodayOrdersActive = todayOrdersActive?.map((order) => {
+  const todayOrdersActiveRender = combineAndSortOrders(todayOrdersActive);
+  console.log(todayOrdersActiveRender);
+  console.log(todayOrdersActive);
+
+  const ShowTodayOrdersActive = todayOrdersActiveRender?.map((order) => {
     return (
       <HistoryItem
         key={order.id}

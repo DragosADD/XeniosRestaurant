@@ -20,6 +20,13 @@ export function calcMinutesLeft(dateStr) {
   return Math.round((d2 - d1) / 60000);
 }
 
+export function calculateTimeDifference(deliveryTime) {
+  deliveryTime = new Date(deliveryTime);
+  const currentTime = new Date();
+  const diffInMs = deliveryTime.getTime() - currentTime.getTime();
+  return diffInMs / (1000 * 60 * 60); // Convert milliseconds to hours
+}
+
 export function calcPriceWithPriority(updatedTotalOrder) {
   return updatedTotalOrder + (updatedTotalOrder * 20) / 100;
 }
@@ -28,8 +35,10 @@ export function ingredientsText(ingredients) {
   let totalCalories = 0;
   let totalWeight = 0;
   ingredients.forEach((ingredient) => {
+    const oneGramCal = ingredient.ingredientCalories / 100;
+    const totalIngredientCalories = ingredient.ingredientWeight * oneGramCal;
     totalWeight = totalWeight + ingredient.ingredientWeight;
-    totalCalories = totalCalories + ingredient.ingredientCalories;
+    totalCalories = totalCalories + totalIngredientCalories;
   });
   const textSummary = ingredients
     .map(
@@ -38,5 +47,7 @@ export function ingredientsText(ingredients) {
     )
     .join(', ');
 
-  return `Ingredients: ${textSummary} total: ${totalWeight}gr -> ${totalCalories} calories`;
+  return `Ingredients: ${textSummary} total: ${totalWeight}gr -> ${totalCalories.toFixed(
+    0
+  )} calories`;
 }

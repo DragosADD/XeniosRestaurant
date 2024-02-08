@@ -18,8 +18,10 @@ function Cart() {
   };
 
   const givePriorityHandler = () => {
-    setIsPriority((prevPriority) => !prevPriority);
-    cartContext.changePriority(priority);
+    setIsPriority((prevPriority) => {
+      cartContext.changePriority(!prevPriority);
+      return !prevPriority;
+    });
   };
   const cart = cartContext.recipesDisplayed;
   const paymentTotal = calcPriceWithPriority(
@@ -76,10 +78,10 @@ function Cart() {
           type="checkbox"
           name="priority"
           id="priority"
-          value={priority}
+          checked={priority}
           onChange={givePriorityHandler}
         />
-        <label htmlFor="priority">Want to yo give your order priority?</label>
+        <label htmlFor="priority">Want to give your order priority?</label>
       </div>
       <div className="mt-3">
         <Button

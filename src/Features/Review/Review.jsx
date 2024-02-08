@@ -10,7 +10,7 @@ import {
   getReviewsWCommentsRelatedToUser,
   getUserReviews,
 } from '../../Services/apiRestaurant';
-import { useLoaderData, useRouteLoaderData } from 'react-router-dom';
+import { redirect, useLoaderData, useRouteLoaderData } from 'react-router-dom';
 import LeaveReview from './LeaveReview';
 
 export default function Review() {
@@ -22,32 +22,34 @@ export default function Review() {
   });
 
   const user = useRouteLoaderData('root'); //to be used when handling modderation things
-
   return (
     <div className="mx-auto max-w-2xl p-4">
-      {reviews.uniqueRecipes ? (
-        <LeaveReview
-          recipesOfUser={reviews.uniqueRecipes}
-          lastReview={reviews.lastReview}
-        />
-      ) : (
-        <p className="mb-4 text-lg font-semibold">
-          You have not ordered any of our recipes
-        </p>
-      )}
-
-      <div className="my-8">
-        <h2 className="mb-4 text-xl font-semibold">My Reviews</h2>
-        {reviewData.reviewsByUser.length === 0 ? (
-          <p className="text-lg">I have no reviews</p>
-        ) : (
-          <div>
-            {reviewData.reviewsByUser.map((el) => (
-              <ReviewItem key={el.reviewId} review={el} />
-            ))}
+      {user.role !== 'service_role' && (
+        <>
+          {reviews.uniqueRecipes ? (
+            <LeaveReview
+              recipesOfUser={reviews.uniqueRecipes}
+              lastReview={reviews.lastReview}
+            />
+          ) : (
+            <p className="mb-4 text-lg font-semibold">
+              You have not ordered any of our recipes
+            </p>
+          )}
+          <div className="my-8">
+            <h2 className="mb-4 text-xl font-semibold">My Reviews</h2>
+            {reviewData.reviewsByUser.length === 0 ? (
+              <p className="text-lg">I have no reviews</p>
+            ) : (
+              <div>
+                {reviewData.reviewsByUser.map((el) => (
+                  <ReviewItem key={el.reviewId} review={el} />
+                ))}
+              </div>
+            )}
           </div>
-        )}
-      </div>
+        </>
+      )}
 
       <div className="my-8">
         <h2 className="mb-4 text-xl font-semibold">
@@ -79,6 +81,7 @@ export default function Review() {
 export async function loader() {
   const user = await getUser();
   await checkAuthLoader();
+
   const {
     id: user_id,
     user_metadata: { name: name },
@@ -86,11 +89,11 @@ export async function loader() {
 
   const reviewsByUser = await getUserReviews(user_id, 'userId');
   const reviewsRelatedToUser = await getReviewsWCommentsRelatedToUser(user_id);
-  console.log(reviewsRelatedToUser);
   const allOtherReviews = await getUserReviews(user_id, 'allOther');
   const recipesOfUser = await getRecipesOfUser(user_id);
   const uniqueFoodIds = new Set();
   const lastReview = await getLastReviewsId();
+
   const uniqueRecipes = recipesOfUser.filter((recipe) => {
     if (!uniqueFoodIds.has(recipe.foodId)) {
       uniqueFoodIds.add(recipe.foodId);
@@ -107,7 +110,6 @@ export async function loader() {
     lastReview,
     name,
   };
-  console.log(bulk);
 
   return bulk;
 }
@@ -118,6 +120,7 @@ export async function action({ request }) {
   const currentDate = new Date();
   const {
     id: user_id,
+    role: role,
     user_metadata: { name: name },
   } = await getUser();
 
@@ -138,7 +141,12 @@ export async function action({ request }) {
   if (typeOfForm === 'addComment') {
     const reviewId = data.get('reviewId');
     const comment = data.get('comment');
-    const data3 = await addComment(reviewId, comment, name, user_id);
+    const data3 = await addComment(
+      reviewId,
+      comment,
+      role === 'service_role' ? 'Moderator' : name,
+      user_id
+    );
     return data3;
   }
   return null;
